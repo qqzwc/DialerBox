@@ -49,7 +49,9 @@ public class XposedMod implements IXposedHookZygoteInit, IXposedHookLoadPackage 
 
 	private static final String CLASS_PHONE_CALL_DETAILS_HELPER = "com.android.dialer.PhoneCallDetailsHelper";
 
-    private static final String CLASS_PHONE_CALL_DETAILS_HELPER_23 = "com.android.dialer.calllog.PhoneCallDetailsHelper";
+	private static final String CLASS_PHONE_CALL_DETAILS_HELPER_27 = "com.android.dialer.app.calllog.PhoneCallDetailsHelper";	
+	
+	private static final String CLASS_PHONE_CALL_DETAILS_HELPER_23 = "com.android.dialer.calllog.PhoneCallDetailsHelper";
 
 	// InCall
 	private static final String CLASS_DIALTACTS_ACTIVITY = "com.android.dialer.DialtactsActivity";
@@ -116,7 +118,9 @@ public class XposedMod implements IXposedHookZygoteInit, IXposedHookLoadPackage 
 			final ClassLoader loader = param.classLoader;
 			final Class<?> classPhoneCallDetails = XposedHelpers.findClass(CLASS_PHONE_CALL_DETAILS, loader);
 
-            if (Build.VERSION.SDK_INT == 23) {
+            if (Build.VERSION.SDK_INT >= 27) {
+                helperClassFullName = CLASS_PHONE_CALL_DETAILS_HELPER_27;
+            } else if (Build.VERSION.SDK_INT >= 23) {
                 helperClassFullName = CLASS_PHONE_CALL_DETAILS_HELPER_23;
             } else if (Build.VERSION.SDK_INT >= 21) {
                 helperClassFullName = CLASS_PHONE_CALL_DETAILS_HELPER;
@@ -138,7 +142,7 @@ public class XposedMod implements IXposedHookZygoteInit, IXposedHookLoadPackage 
 					}
 
                     String fieldName = "";
-                    if (Build.VERSION.SDK_INT == 23) {
+                    if (Build.VERSION.SDK_INT >= 23) {
                         fieldName = "nameAlternative";
                     } else if (Build.VERSION.SDK_INT >= 21) {
                         fieldName = "name";
@@ -202,7 +206,7 @@ public class XposedMod implements IXposedHookZygoteInit, IXposedHookLoadPackage 
                 }
             };
 
-            if (Build.VERSION.SDK_INT == 23) {
+            if (Build.VERSION.SDK_INT >= 23) {
                 XposedHelpers.findAndHookMethod(classCallCardFragment, "setPrimary", String.class, String.class, boolean.class,
                         String.class, Drawable.class, boolean.class, boolean.class, addCallHook);
             }else if (Build.VERSION.SDK_INT >= 21) {
@@ -376,7 +380,7 @@ public class XposedMod implements IXposedHookZygoteInit, IXposedHookLoadPackage 
 		try {
 			final ClassLoader classLoader = param.classLoader;
 			// public static ArrayList<String> com.android.dialer.dialpad.SmartDialPrefix.generateNamePrefixes(String index)
-			XposedHelpers.findAndHookMethod("com.android.dialer.dialpad.SmartDialPrefix", classLoader,
+			XposedHelpers.findAndHookMethod("com.android.dialer.smartdial.SmartDialPrefix", classLoader,
 				"generateNamePrefixes", String.class, new XC_MethodHook() {
 					// Convert index into Pin Yin.
 					@Override
@@ -406,7 +410,7 @@ public class XposedMod implements IXposedHookZygoteInit, IXposedHookLoadPackage 
 
 			// boolean com.android.dialer.dialpad.SmartDialNameMatcher
 			//	.matchesCombination(String displayName, String query, ArrayList<SmartDialMatchPosition> matchList)
-			XposedHelpers.findAndHookMethod("com.android.dialer.dialpad.SmartDialNameMatcher", classLoader,
+			XposedHelpers.findAndHookMethod("com.android.dialer.smartdial.SmartDialNameMatcher", classLoader,
 				"matchesCombination", String.class, String.class, ArrayList.class, new XC_MethodHook() {
 
 					@Override
